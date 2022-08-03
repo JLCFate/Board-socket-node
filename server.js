@@ -35,10 +35,11 @@ io.on("connect", async (socket) => {
 	if (result_row.length === 0 || !result_row[0]["authorized"]) {
 		socket.emit("failed", { status: result_row.length === 0 || result_row[0]["awaiting"] ? "newUser" : "unauthorized" });
 		if (result_row.length === 0) {
-			pool.query("INSERT INTO users (name, address, authorized, awaiting) VALUES ($1, $2, false, true)", [
-				socket.handshake.headers["x-name"],
-				socket.handshake.headers["x-address"],
-			]);
+			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined)
+				pool.query("INSERT INTO users (name, address, authorized, awaiting) VALUES ($1, $2, false, true)", [
+					socket.handshake.headers["x-name"],
+					socket.handshake.headers["x-address"],
+				]);
 		}
 	} else {
 		socket.emit("authorized", result_row[0]);
