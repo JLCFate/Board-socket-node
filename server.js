@@ -24,8 +24,8 @@ io.on("connect", async (socket) => {
 		socket.emit("joined");
 	});
 
-	if (result_row.length === 0 || !result_row[0]["authorized"]) {
-		socket.emit("failed", { status: result_row.length === 0 || result_row[0]["awaiting"] ? "newUser" : "unauthorized" });
+	if (result_row.length === 0 || !result_row["authorized"]) {
+		socket.emit("failed", { status: result_row.length === 0 || result_row["awaiting"] ? "newUser" : "unauthorized" });
 		if (result_row.length === 0) {
 			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined)
 				await fetch(`${process.env.API_URL}/users/`, {
@@ -35,7 +35,7 @@ io.on("connect", async (socket) => {
 				});
 		}
 	} else {
-		socket.emit("authorized", result_row[0]);
+		socket.emit("authorized", result_row);
 	}
 
 	socket.on("open", async (data) => {
@@ -44,7 +44,7 @@ io.on("connect", async (socket) => {
 		const result = await fetch(`${process.env.API_URL}/users/get/${dataJson.user_mac}`, { method: "GET", headers: { "Content-Type": "application/json" } });
 		await fetch(`${process.env.API_URL}/logs/`, {
 			method: "POST",
-			body: JSON.stringify({ name: result[0].name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() }),
+			body: JSON.stringify({ name: result.name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() }),
 			headers: { "Content-Type": "application/json" },
 		});
 	});
