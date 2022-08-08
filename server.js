@@ -37,7 +37,7 @@ io.on("connect", async (socket) => {
 		socket.emit("authorized", result_row[0]);
 	}
 
-	socket.on("open", (data) => {
+	socket.on("open", async (data) => {
 		const dataJson = JSON.parse(data);
 		socket.to("gate").emit("open", dataJson.gate);
 		const result = await fetch(`${process.env.API_URL}/users/get/${dataJson.user_mac}`, { method: "GET", headers: { "Content-Type": "application/json" } });
