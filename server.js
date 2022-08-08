@@ -11,7 +11,7 @@ const server = http.createServer(app);
 const io = socketIo(server, { cors: { orgin: "*" } });
 
 const filter = async (mac_address_in) => {
-	const result = await axios({ method: "GET", url: `${process.env.API_URL}/users/get/${mac_address_in}` });
+	const result = await axios({ method: "get", url: `${process.env.API_URL}/users/get/${mac_address_in}`, responseType: "application/json" });
 	return result;
 };
 
@@ -29,9 +29,10 @@ io.on("connect", async (socket) => {
 		if (result_row.length === 0) {
 			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined)
 				await axios({
-					method: "POST",
+					method: "post",
 					url: `${process.env.API_URL}/users/`,
 					data: { name: socket.handshake.headers["x-name"], address: socket.handshake.headers["x-address"] },
+					responseType: "application/json",
 				});
 		}
 	} else {
@@ -41,11 +42,12 @@ io.on("connect", async (socket) => {
 	socket.on("open", async (data) => {
 		const dataJson = JSON.parse(data);
 		socket.to("gate").emit("open", dataJson.gate);
-		const result = await axios({ method: "GET", url: `${process.env.API_URL}/users/get/${dataJson.user_mac}` });
+		const result = await axios({ method: "get", url: `${process.env.API_URL}/users/get/${dataJson.user_mac}`, responseType: "application/json" });
 		await axios({
-			method: "POST",
+			method: "post",
 			url: `${process.env.API_URL}/logs/`,
 			data: { name: result[0].name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() },
+			responseType: "application/json",
 		});
 	});
 
