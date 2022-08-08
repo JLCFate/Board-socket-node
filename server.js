@@ -27,12 +27,14 @@ io.on("connect", async (socket) => {
 	if (result_row.length === 0 || !result_row["authorized"]) {
 		socket.emit("failed", { status: result_row.length === 0 || result_row["awaiting"] ? "newUser" : "unauthorized" });
 		if (result_row.length === 0) {
-			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined)
+			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined) {
+				console.log("Creating");
 				await fetch(`${process.env.API_URL}/users/`, {
 					method: "POST",
 					body: JSON.stringify({ name: socket.handshake.headers["x-name"], address: socket.handshake.headers["x-address"] }),
 					headers: { "Content-Type": "application/json" },
 				});
+			}
 		}
 	} else {
 		socket.emit("authorized", result_row);
