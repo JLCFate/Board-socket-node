@@ -42,10 +42,12 @@ io.on("connect", async (socket) => {
 
 	socket.on("open", async (data) => {
 		const dataJson = JSON.parse(data);
+		console.log(data);
+		console.log(dataJson);
 		socket.to("gate").emit("open", dataJson.gate);
 		const result = await fetch(`${process.env.API_URL}/users/get/${dataJson.user_mac}`, { method: "GET", headers: { "Content-Type": "application/json" } });
 		const resultJson = await result.json();
-		await fetch(`${process.env.API_URL}/logs/`, {
+		await fetch(`${process.env.API_URL}/logs`, {
 			method: "POST",
 			body: JSON.stringify({ name: resultJson[0].name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() }),
 			headers: { "Content-Type": "application/json" },
