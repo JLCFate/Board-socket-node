@@ -12,6 +12,7 @@ const io = socketIo(server, { cors: { orgin: "*" } });
 
 const filter = async (mac_address_in) => {
 	const result = await fetch(`${process.env.API_URL}/users/get/${mac_address_in}`, { method: "GET", headers: { "Content-Type": "application/json" } });
+	console.log(result);
 	return result;
 };
 
@@ -26,7 +27,7 @@ io.on("connect", async (socket) => {
 
 	if (result_row.size === 0 || !result_row["authorized"]) {
 		socket.emit("failed", { status: result_row.size === 0 || result_row["awaiting"] ? "newUser" : "unauthorized" });
-		console.log(result_row);
+		console.log(socket.handshake.headers["x-address"]);
 		if (result_row.size === 0) {
 			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined) {
 				console.log("Creating");
