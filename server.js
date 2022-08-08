@@ -13,7 +13,6 @@ const io = socketIo(server, { cors: { orgin: "*" } });
 const filter = async (mac_address_in) => {
 	const result = await fetch(`${process.env.API_URL}/users/get/${mac_address_in}`, { method: "GET", headers: { "Content-Type": "application/json" } });
 	const data = await result.json();
-	console.log(data);
 	return data;
 };
 
@@ -31,7 +30,6 @@ io.on("connect", async (socket) => {
 		console.log(socket.handshake.headers["x-address"]);
 		if (result_row.length === 0) {
 			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined) {
-				console.log("Creating");
 				await fetch(`${process.env.API_URL}/users/`, {
 					method: "POST",
 					body: JSON.stringify({ name: socket.handshake.headers["x-name"], address: socket.handshake.headers["x-address"] }),
