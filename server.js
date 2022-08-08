@@ -12,8 +12,9 @@ const io = socketIo(server, { cors: { orgin: "*" } });
 
 const filter = async (mac_address_in) => {
 	const result = await fetch(`${process.env.API_URL}/users/get/${mac_address_in}`, { method: "GET", headers: { "Content-Type": "application/json" } });
-	console.log(result);
-	return result;
+	const data = await result.json();
+	console.log(data);
+	return data;
 };
 
 io.on("connect", async (socket) => {
