@@ -27,7 +27,6 @@ io.on("connect", async (socket) => {
 
 	if (result_row.length === 0 || !result_row[0]["authorized"]) {
 		socket.emit("failed", { status: result_row.length === 0 || result_row[0]["awaiting"] ? "newUser" : "unauthorized" });
-		console.log(socket.handshake.headers["x-address"]);
 		if (result_row.length === 0) {
 			if (socket.handshake.headers["x-name"] !== undefined && socket.handshake.headers["x-address"] !== undefined) {
 				await fetch(`${process.env.API_URL}/users/`, {
