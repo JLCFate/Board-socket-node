@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const fetch = require("node-fetch");
+const fetch = import("node-fetch");
 
 const port = process.env.PORT || 4001;
 const app = express();
