@@ -48,7 +48,7 @@ io.on("connect", async (socket) => {
 		await fetch(`${process.env.API_URL}/logs`, {
 			method: "POST",
 			body: JSON.stringify({ name: resultJson[0].name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() }),
-			headers: { "Content-Type": "application/json" },
+			headers: { "Content-Type": "application/json", "X-Address": dataJson.user_mac },
 		});
 		socket.emit("recieved");
 	});
