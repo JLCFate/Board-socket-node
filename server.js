@@ -19,12 +19,13 @@ const filter = async (mac_address_in) => {
 
 io.on("connect", async (socket) => {
 	let result_row = await filter(socket.handshake.headers["x-address"]);
-	console.log(`Połączono: ${socket.id}`);
+	console.log(`[${socket.id}] Połączono`);
 
-	socket.on("join", () => {
-		socket.join("gate");
-		socket.emit("joined");
-	});
+	if (socket.handshake.headers["x-room"]) {
+		socket.join(socket.handshake.headers["x-room"]);
+		console.log(`[${socket.id}] Dołączył do pokoju '${socket.handshake.headers["x-room"]}'`);
+		socket.emit("joined", socket.handshake.headers["x-room"]);
+	}
 
 	if (result_row.length === 0 || !result_row[0]["authorized"]) {
 		socket.emit("failed", { status: result_row.length === 0 || result_row[0]["awaiting"] ? "newUser" : "unauthorized" });
@@ -63,7 +64,12 @@ io.on("connect", async (socket) => {
 		}
 	});
 
-	socket.on("disconnect", () => console.log(`Rozłączono: ${socket.id}`));
+	socket.on("justKeepSwimming", () => {
+		console.log("[SERVER] Just Keep Swimming");
+		socket.emit("imAmSwimming");
+	});
+
+	socket.on("disconnect", () => console.log(`[${socket.id}] Rozłączono`));
 });
 
-server.listen(port, () => console.log(`Nasłuchuję port: ${port}`));
+server.listen(port, () => console.log(`[SERVER] Nasłuchuję port: ${port}`));
