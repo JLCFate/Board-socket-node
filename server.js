@@ -7,6 +7,7 @@ const fetch = require("node-fetch");
 const port = process.env.PORT || 4001;
 const app = express();
 const server = http.createServer(app);
+let lockStatus = { front: false, back: false };
 
 const io = socketIo(server, { cors: { orgin: "*" } });
 
@@ -42,15 +43,24 @@ io.on("connect", async (socket) => {
 
 	socket.on("open", async (data) => {
 		const dataJson = JSON.parse(data);
-		socket.to("gate").emit("open", dataJson.gate);
-		const result = await fetch(`${process.env.API_URL}/users/get/${dataJson.user_mac}`, { method: "GET", headers: { "Content-Type": "application/json" } });
-		const resultJson = await result.json();
-		await fetch(`${process.env.API_URL}/logs`, {
-			method: "POST",
-			body: JSON.stringify({ name: resultJson[0].name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() }),
-			headers: { "Content-Type": "application/json", "X-Address": dataJson.user_mac },
-		});
-		socket.emit("recieved");
+		if (!lockStatus[dataJson.gate]) {
+			socket.to("gate").emit("open", dataJson.gate);
+			lockStatus[dataJson.gate] = true;
+			const result = await fetch(`${process.env.API_URL}/users/get/${dataJson.user_mac}`, {
+				method: "GET",
+				headers: { "Content-Type": "application/json" },
+			});
+			const resultJson = await result.json();
+			await fetch(`${process.env.API_URL}/logs`, {
+				method: "POST",
+				body: JSON.stringify({ name: resultJson[0].name, address: dataJson.user_mac, type: dataJson.gate, date: new Date() }),
+				headers: { "Content-Type": "application/json", "X-Address": dataJson.user_mac },
+			});
+			socket.emit("recieved");
+			await setTimeout(() => (lockStatus[dataJson.gate] = false), 5000);
+		} else {
+			socket.emit("gateBusy", dataJson.gate);
+		}
 	});
 
 	socket.on("disconnect", () => console.log(`Rozłączono: ${socket.id}`));
