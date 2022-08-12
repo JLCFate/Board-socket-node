@@ -65,7 +65,6 @@ io.on("connect", async (socket) => {
 	});
 
 	socket.on("justKeepSwimming", () => {
-		console.log("[SERVER] Just Keep Swimming");
 		socket.emit("imAmSwimming");
 	});
 
