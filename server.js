@@ -20,15 +20,12 @@ const filter = async (mac_address_in) => {
 io.on("connect", async (socket) => {
 	let result_row = await filter(socket.handshake.headers["x-address"]);
 	console.log(`[${socket.id}] Połączono`);
-	console.log(socket.handshake.headers["x-address"]);
 
 	if (socket.handshake.headers["x-room"]) {
 		socket.join(socket.handshake.headers["x-room"]);
 		console.log(`[${socket.id}] Dołączył do pokoju '${socket.handshake.headers["x-room"]}'`);
 		socket.emit("joined", socket.handshake.headers["x-room"]);
 	}
-
-	console.log(result_row);
 
 	if (result_row.length === 0 || !result_row[0]["authorized"]) {
 		socket.emit("failed", { status: result_row.length === 0 || result_row[0]["awaiting"] ? "newUser" : "unauthorized" });
@@ -47,7 +44,6 @@ io.on("connect", async (socket) => {
 
 	socket.on("open", async (data) => {
 		const dataJson = JSON.parse(data);
-		console.log(dataJson);
 		if (!lockStatus[dataJson.gate]) {
 			socket.to("gate").emit("open", dataJson.gate);
 			lockStatus[dataJson.gate] = true;
