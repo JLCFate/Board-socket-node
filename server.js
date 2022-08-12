@@ -44,6 +44,7 @@ io.on("connect", async (socket) => {
 
 	socket.on("open", async (data) => {
 		const dataJson = JSON.parse(data);
+		console.log(dataJson);
 		if (!lockStatus[dataJson.gate]) {
 			socket.to("gate").emit("open", dataJson.gate);
 			lockStatus[dataJson.gate] = true;
