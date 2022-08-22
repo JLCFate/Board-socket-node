@@ -46,7 +46,6 @@ io.on("connect", async (socket) => {
 		const dataJson = JSON.parse(data);
 		if (!lockStatus[dataJson.gate]) {
 			socket.to("gate").emit("open", dataJson.gate);
-			console.log("opening");
 			lockStatus[dataJson.gate] = true;
 			const result = await fetch(`${process.env.API_URL}/users/get/${dataJson.user_mac}`, {
 				method: "GET",
@@ -63,10 +62,6 @@ io.on("connect", async (socket) => {
 		} else {
 			socket.emit("gateBusy", dataJson.gate);
 		}
-	});
-
-	socket.on("justKeepSwimming", () => {
-		socket.emit("imAmSwimming");
 	});
 
 	socket.on("disconnect", () => console.log(`[${socket.id}] Rozłączono`));
